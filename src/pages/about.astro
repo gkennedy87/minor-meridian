@@ -1,6 +1,59 @@
-<a href="/">Home</a>
-<a href="/about">About</a>
-<a href="/blog">Blog</a>
+---
+const pageTitle = "About";
 
-<h1>About Us</h1>
-<h2>My new astro site</h2>
+const identity = {
+  firstName: "Grant",
+  country: "Japan",
+  occupation: "Head of Business Development - Japan",
+  hobbies: ["Cooking", "Language Learning", "Web Development"],
+};
+
+const devSkills = ["HTML", "CSS", "JavaScript", "React", "Astro", "PHP"];
+
+const softSkills = ["intercultural communication","public speaking","sales","negotiating"];
+
+const happy = true;
+const finished = false;
+const goal = 3;
+---
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{pageTitle}</title>
+</head>
+<body>
+    <a href="/">Home</a>
+    <a href="/about">About</a>
+    <a href="/blog">Blog</a>
+
+    <h1>About Us</h1>
+    <h2>My new astro site</h2>
+
+    <p>Here's a few things about me...</p>
+
+    <ul>
+        <li>My name is {identity.firstName}</li>
+        <li>I live in {identity.country}</li>
+        { identity.hobbies.length >= 2 && 
+            <li>Two of my hobbies are: {identity.hobbies[0]} and {identity.hobbies[1]}</li>
+        }
+    </ul>
+    <p>My soft skills are:</p>
+    <ul>
+        {softSkills.map((skill) => <li>{skill}</li>)}
+    </ul>
+
+    <p>My dev skills are:</p>
+    <ul>
+        {devSkills.map((skill) => <li>{skill}</li>)}
+    </ul>
+    {happy && <p>I am happy to be learning Astro</p>}
+
+    {finished && <p>I am finished with the tutorial!</p>}
+
+    {goal === 3 ? <p>My goal is to finish in 3 days</p> : <p>My goal is not 3 days.</p>}
+
+</body>
+
+</html>
