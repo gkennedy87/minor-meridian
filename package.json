@@ -32,6 +32,7 @@
     "typography"
   ],
   "dependencies": {
+    "@astrojs/cloudflare": "^12.6.11",
     "@astrojs/mdx": "^4.3.0",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.6.0",
