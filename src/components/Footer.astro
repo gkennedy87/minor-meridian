@@ -1,5 +1,6 @@
 ---
 import { config } from '../config';
+import SocialLinks from './SocialLinks.astro';
 
 const currentYear = new Date().getFullYear();
 ---
@@ -15,8 +16,8 @@ const currentYear = new Date().getFullYear();
         • <a href="https://github.com/yourusername/volks-typo" target="_blank" rel="noopener">Volks-Typo Theme</a>
       </p>
     </div>
-    
-    <div class="social-links">
+    <SocialLinks />
+    <!-- <div class="social-links">
       {config.social.github && (
         <a href={config.social.github} target="_blank" rel="noopener" aria-label="GitHub" class="social-link">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -56,7 +57,7 @@ const currentYear = new Date().getFullYear();
           </svg>
         </a>
       )}
-    </div>
+    </div> -->
   </div>
 </footer>
 
@@ -102,7 +103,7 @@ const currentYear = new Date().getFullYear();
     color: var(--color-text-primary);
   }
 
-  .social-links {
+  /* .social-links {
     display: flex;
     gap: calc(var(--grid-unit) * 1.5);
     align-items: center;
@@ -131,7 +132,7 @@ const currentYear = new Date().getFullYear();
     width: 20px;
     height: 20px;
   }
-
+*/
   @media (max-width: 768px) {
     .footer-content {
       flex-direction: column;
@@ -143,8 +144,5 @@ const currentYear = new Date().getFullYear();
       order: 2;
     }
 
-    .social-links {
-      order: 1;
-    }
   }
 </style>

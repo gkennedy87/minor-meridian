@@ -6,6 +6,7 @@ export interface SiteConfig {
     bio: string;
     avatar?: string;
   };
+  tagline?: string;
   social: {
     github?: string;
     twitter?: string;
@@ -17,20 +18,19 @@ export interface SiteConfig {
 }
 
 export const config: SiteConfig = {
-  title: "Volks-Typo",
-  description: "A blog exploring the intersection of design, typography, and history",
+  title: "Grant Kennedy",
+  description: "Web consultant who builds sites that actually work. No fluff. No agency BS. Just fast, accessible, converting websites for businesses tired of pretty things that don't perform.",
   author: {
-    name: "Your Name",
-    bio: "Writer, designer, and explorer of aesthetic tensions between past and present.",
-    // avatar: "/images/avatar.jpg" // Uncomment and add your avatar image to public/images/
+    name: "Grant Kennedy",
+    bio: "Independent web consultant. I build sites that convert, not ones that win design awards.",
+    // avatar: "/images/avatar.jpg"
   },
+  tagline: "Performance. Accessibility. SEO. The plumbing that matters.",
   social: {
-    github: "https://github.com/yourusername",
-    twitter: "https://twitter.com/yourusername",
-    linkedin: "https://linkedin.com/in/yourusername",
-    email: "your.email@example.com"
+    github: "https://github.com/gkennedy87",
+    linkedin: "https://linkedin.com/in/thegrantkennedy",
   },
-  siteUrl: "https://volks-typo.example.com"
+  siteUrl: "https://www.gmkennedy.com"
 };
 
 // Export constants for SEO component

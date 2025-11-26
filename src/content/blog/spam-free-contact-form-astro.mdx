@@ -1,0 +1,223 @@
+---
+title: "How I Stopped Spam Submissions Without Hurting Accessibility"
+author: "Grant Kennedy"
+date: "2025-11-10"
+categories: ["Web Development"]
+description: "Building a spam-proof contact form with honeypots, Cloudflare Turnstile, and Zod validation—without breaking accessibility or user experience."
+tags: ["accessibility", "web-security", "astro", "cloudflare"]
+---
+
+Website contact forms are a funny thing — they're essential for business, yet often the first point of attack for spam bots. Recently, one of my client projects started receiving a steady stream of AI-generated "business inquiries" written in perfect Japanese. They looked human at first glance, but the telltale signs were there: generic greetings, embedded tracking links, and copy-and-paste marketing text.
+
+At peak, the site was receiving 20-30 spam submissions daily — roughly 95% of all form traffic.
+
+The challenge was clear:
+Eliminate automated spam without adding friction for real users — or breaking accessibility.
+
+## Step 1: Understanding the Problem
+
+Most spam filters rely on CAPTCHAs that frustrate users, especially those using assistive technology.
+I needed something that would:
+
+- Run invisibly for genuine users,
+- Stop automated form submissions cold, and
+- Stay fully compliant with screen readers and keyboard navigation.
+
+After analyzing server logs and form submission patterns, I confirmed that the attackers were submitting via automated scripts — not manually filling out fields. Response times were suspiciously fast (under 2 seconds from page load to submission), and they were bypassing client-side validation entirely by posting directly to the API endpoint.
+
+## Step 2: Building a Stealth Honeypot
+
+The first line of defense was a honeypot field — a hidden input that normal users never see, but bots eagerly fill in.
+The trick was to disguise it so that smarter bots wouldn't detect a class name like `hidden` or `honeypot`.
+
+Here's the approach I implemented in Astro:
+
+```astro
+<!-- ContactForm.astro -->
+<form id="contactForm" method="POST" action="/api/contact">
+  <input type="text" name="name" required placeholder="Your Name" />
+  <input type="email" name="email" required placeholder="Your Email" />
+  <textarea name="message" required placeholder="Your Message"></textarea>
+
+  <!-- Stealth honeypot -->
+  <div style="position:absolute;opacity:0;width:1px;height:1px;overflow:hidden;">
+    <label for="field_reference">Leave this blank</label>
+    <input
+      type="text"
+      id="field_reference"
+      name="field_reference"
+      tabindex="-1"
+      autocomplete="off"
+      aria-hidden="true"
+    />
+  </div>
+
+  <button type="submit">Send</button>
+</form>
+```
+
+A few implementation notes:
+
+- I used CSS positioning (`position: absolute` + `opacity: 0`) rather than `display: none` because some bots now detect and skip display:none elements.
+- `tabindex="-1"` removes it from keyboard navigation entirely.
+- `aria-hidden="true"` ensures screen readers skip it completely.
+- The label "Leave this blank" is technically visible to screen readers, but assistive tech users can tab right past it without interaction.
+
+And on the server side:
+
+```typescript
+// src/pages/api/contact.ts
+const trap = data.get("field_reference");
+if (trap && trap.toString().trim() !== "") {
+  return new Response(JSON.stringify({ success: false, error: "Bot detected" }), {
+    status: 400,
+  });
+}
+```
+
+This simple addition blocked roughly 85% of bot submissions instantly — all without impacting accessibility.
+
+## Step 3: Layering Cloudflare Turnstile for Advanced Protection
+
+To catch more sophisticated AI-driven scripts, I added Cloudflare Turnstile, a privacy-friendly alternative to reCAPTCHA.
+
+I chose Turnstile over reCAPTCHA for a few reasons:
+
+- **Privacy-first**: No Google tracking or data collection
+- **Better performance**: Lighter client-side footprint (~30KB vs reCAPTCHA's ~100KB+)
+- **Truly invisible**: In invisible mode, there's no badge flash during page load, and verification happens seamlessly in the background
+
+It runs invisibly and generates a verification token only after confirming the user's browser behavior is human.
+
+Here's how I integrated it into the form:
+
+```astro
+<div
+  class="cf-turnstile"
+  data-sitekey={siteKey}
+  data-theme="light"
+  data-size="invisible"
+  data-callback="onTurnstileSuccess"
+></div>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script>
+  function onTurnstileSuccess() {
+    document.getElementById("contactForm").submit();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("contactForm");
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      turnstile.execute(); // Trigger verification first
+    });
+  });
+</script>
+```
+
+Then, in the API route:
+
+```typescript
+const token = data.get("cf-turnstile-response");
+const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+  method: "POST",
+  headers: { "content-type": "application/x-www-form-urlencoded" },
+  body: `secret=${secret}&response=${token}`,
+});
+const verifyData = await verifyRes.json();
+
+if (!verifyData.success) {
+  return new Response(JSON.stringify({ success: false, error: "Verification failed" }), {
+    status: 403,
+  });
+}
+```
+
+For development, I configured automatic switching between Cloudflare test keys (which always pass) and real keys for production — ensuring smooth local testing without domain restrictions:
+
+```typescript
+const isProduction = import.meta.env.PROD;
+const siteKey = isProduction 
+  ? import.meta.env.TURNSTILE_SITE_KEY 
+  : '1x00000000000000000000AA'; // Cloudflare test key
+```
+
+This meant zero friction during local development — no need to configure domains or bypass checks during testing.
+
+Turnstile verification adds roughly 200-300ms of latency, which is imperceptible to users but catches the remaining 15% of spam that slipped past the honeypot.
+
+## Step 4: Zod Validation for Data Integrity
+
+While Turnstile stopped bots, I also wanted to make sure real submissions were valid — and I wanted defense in depth.
+
+Using Zod, I created a single shared schema to validate form input both client-side and server-side:
+
+```typescript
+import { z } from "astro/zod";
+
+export const contactSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  message: z.string().min(10),
+  terms: z.literal("on"),
+});
+```
+
+This keeps the form resilient — if a user somehow bypasses the frontend validation (or a bot tries to post malformed data directly to the API), invalid data still won't reach the email service or CRM. It's a simple but effective layer that ensures only clean, structured data makes it through.
+
+## Architecture Overview
+
+Here's how the layers work together:
+
+**Submission Flow:**
+1. Client-side: Zod validation
+2. Client-side: Turnstile verification triggered
+3. Server-side: Honeypot check
+4. Server-side: Turnstile token verification with Cloudflare
+5. Server-side: Zod validation (defense in depth)
+6. Email sent via Resend API
+
+Each layer is lightweight, and failure at any stage blocks the submission. Most importantly, legitimate users only experience step 1 and 2 — the rest happens transparently.
+
+## Edge Cases & Trade-offs
+
+A few considerations I made during implementation:
+
+- **JavaScript dependency**: Turnstile requires JavaScript, so I added a `<noscript>` fallback notice for the \<1% of users with JS disabled. In that case, I suggest they email directly.
+- **Rate limiting**: I added server-side rate limiting (not shown above) at the API level to prevent brute-force attempts — 5 submissions per IP per hour.
+- **Regional blocking**: Turnstile gracefully degrades if Cloudflare is blocked in certain regions (rare, but it happens). The honeypot still catches most bots in those cases.
+- **Time-based analysis**: I initially considered rejecting submissions under 3 seconds (likely bots), but found it unnecessary with the current setup and didn't want false positives from autofill users.
+
+## The Result
+
+Within a few hours of deployment, the results were immediate and measurable:
+
+**After 3 months in production:**
+- Spam submissions blocked: 100% (0 successful spam submissions reached the client)
+- False positives: 0 out of ~150 legitimate submissions
+- Average latency added: \<300ms (imperceptible)
+- Maintenance required: None
+
+Perhaps most importantly, the solution is invisible to real visitors.
+There's no CAPTCHA puzzle, no "click all the traffic lights" — just a seamless, secure contact experience.
+
+## Lessons Learned
+
+This project reinforced several key engineering principles:
+
+- **Defense in depth**: Multiple layers beat a single "perfect" solution. Each layer catches what the previous one missed.
+- **Invisible security is good UX**: The best anti-spam doesn't announce itself to users.
+- **Accessibility isn't optional**: Solutions that work for everyone are better engineered, period.
+- **Developer experience matters**: Local dev shouldn't require production credentials or complicated workarounds.
+
+Security and usability don't have to be in conflict — when done right, they strengthen each other.
+
+## Technologies Used
+
+- **Astro 4.x** (SSR enabled) for frontend and API routes
+- **Cloudflare Turnstile** for invisible bot protection
+- **Zod** for type-safe input validation
+- **Resend** for transactional email delivery
+
+If you're dealing with form spam, this stack is production-ready and takes about half a day to implement properly. The combination of honeypot + Turnstile + validation creates defense in depth without UX friction — and it's been running maintenance-free since deployment.
