@@ -29,7 +29,7 @@ const description = "Unfiltered takes on web performance, SEO, and why most webs
         {sortedPosts.map((post: any) => (
           <article class="post-item">
             <h2 class="post-title">
-              <a href={`${base}/blog/${post.file.split('/').pop()?.replace(/\.(md|mdx)$/, '')}`}>{post.frontmatter.title}</a>
+              <a href={`/blog/${post.file.split('/').pop()?.replace(/\.(md|mdx)$/, '')}`}>{post.frontmatter.title}</a>
             </h2>
             
             <div class="post-meta">
@@ -56,7 +56,7 @@ const description = "Unfiltered takes on web performance, SEO, and why most webs
               <p class="post-excerpt">{post.frontmatter.excerpt}</p>
             )}
             
-            <a href={`${base}/blog/${post.file.split('/').pop()?.replace(/\.(md|mdx)$/, '')}`} class="read-more">Read More →</a>
+            <a href={`/blog/${post.file.split('/').pop()?.replace(/\.(md|mdx)$/, '')}`} class="read-more">Read More →</a>
           </article>
         ))}
       </div>
