@@ -1,7 +1,8 @@
 ---
 import { config } from '../config';
 import SocialLinks from './SocialLinks.astro';
-import ThemeToggle from './ThemeToggle.astro';
+import ThemeToggle from './ThemeToggle.svelte';
+import { Image } from 'astro:assets';
 
 const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: '' };
 ---
@@ -19,7 +20,7 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     
     <div class="site-title">
       <a href={base}>
-        <img src={base + "site-title.svg"} alt={config.title} class="title-svg" />
+        <Image src={base + "site-title.svg"} alt={config.title} class="title-svg" width={180} height={48} />
       </a>
     </div>
     
@@ -30,21 +31,12 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
           <li><a href={base + "blog"} class="nav-link">Blog</a></li>
           <li><a href={base + "categories"} class="nav-link">Categories</a></li>
           <li><a href={base + "about"} class="nav-link">About</a></li>
+          <li><a href={base + "contact"} class="nav-link">Contact</a></li>
         </ul>
       </nav>
       
       <!-- Mobile controls group - RSS and Search on right -->
       <div class="mobile-controls">
-        <ThemeToggle />
-        
-        <a href={base + "rss.xml"} class="rss-toggle" title="RSS Feed">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <circle cx="5" cy="19" r="2" fill="currentColor"/>
-            <path d="M3 3v2c8.284 0 15 6.716 15 15h2c0-9.389-7.611-17-17-17z" fill="currentColor"/>
-            <path d="M3 9v2c4.963 0 9 4.037 9 9h2c0-6.065-4.935-11-11-11z" fill="currentColor"/>
-          </svg>
-          <span class="visually-hidden">RSS</span>
-        </a>
         
         <button class="search-toggle" id="search-toggle" aria-label="Search articles">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -64,6 +56,17 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     <li><a href={base + "categories"} class="mobile-nav-link">Categories</a></li>
     <li><a href={base + "about"} class="mobile-nav-link">About</a></li>
   </ul>
+  <div class="nav-menu-other">
+      <ThemeToggle client:load/>
+      <a href={base + "rss.xml"} class="rss-toggle" title="RSS Feed">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="5" cy="19" r="2" fill="currentColor"/>
+          <path d="M3 3v2c8.284 0 15 6.716 15 15h2c0-9.389-7.611-17-17-17z" fill="currentColor"/>
+          <path d="M3 9v2c4.963 0 9 4.037 9 9h2c0-6.065-4.935-11-11-11z" fill="currentColor"/>
+        </svg>
+        <span class="visually-hidden">RSS</span>
+      </a>
+  </div>
 </nav>
 
 <div class="search-overlay" id="search-overlay">
@@ -279,6 +282,7 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
     max-width: 280px;
     border: none !important; /* Override global img styles */
     margin: 0 !important; /* Override global img styles */
+    font-size: 48px;
   }
 
   .header-controls {
@@ -711,6 +715,20 @@ const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: 
       height: 36px;
       width: auto;
       max-width: 180px;
+      font-size: 3rem;
+    }
+
+    .nav-menu-other {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+      height: 2rem;
+      justify-content: start;
+      align-items:start;
+    }
+
+    .nav-menu-other {
+      padding: 0 1.5rem;
     }
     
     .header-controls {

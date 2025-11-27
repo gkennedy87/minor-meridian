@@ -6,6 +6,8 @@ import sitemap from '@astrojs/sitemap';
 
 import cloudflare from '@astrojs/cloudflare';
 
+import svelte from '@astrojs/svelte';
+
 // https://astro.build/config
 export default defineConfig({
   // The site property should be your final deployed URL
@@ -15,7 +17,7 @@ export default defineConfig({
   // For Netlify/Vercel, leave this undefined (no base path)
   base: process.env.BASE_PATH || undefined,
 
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap(), svelte()],
 
   markdown: {
     shikiConfig: {

@@ -1,5 +1,8 @@
 ---
 import { config } from "../config";
+import ThemeToggle from './ThemeToggle.svelte';
+const { base = '' } = Astro.site ? { base: import.meta.env.BASE_URL } : { base: '' };
+
 ---
 
 <div class="social-links">
@@ -26,7 +29,6 @@ import { config } from "../config";
         </svg>
       </a>
     )}
-    
     {config.social.linkedin && (
       <a href={config.social.linkedin} target="_blank" rel="noopener" aria-label="LinkedIn" class="social-link">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -42,6 +44,17 @@ import { config } from "../config";
         </svg>
       </a>
     )}
+
+    <a href={base + "rss.xml"} class="social-link" aria-label="RSS Feed">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="5" cy="19" r="2" fill="currentColor"/>
+        <path d="M3 3v2c8.284 0 15 6.716 15 15h2c0-9.389-7.611-17-17-17z" fill="currentColor"/>
+        <path d="M3 9v2c4.963 0 9 4.037 9 9h2c0-6.065-4.935-11-11-11z" fill="currentColor"/>
+      </svg>
+      <span class="visually-hidden">RSS</span>
+    </a>
+
+    <ThemeToggle client:load />
   </div>
 
   <style>
@@ -73,6 +86,18 @@ import { config } from "../config";
   .social-link svg {
     width: 20px;
     height: 20px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   @media (max-width: 768px) {
