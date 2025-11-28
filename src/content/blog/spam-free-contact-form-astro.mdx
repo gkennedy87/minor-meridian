@@ -177,7 +177,7 @@ Here's how the layers work together:
 3. Server-side: Honeypot check
 4. Server-side: Turnstile token verification with Cloudflare
 5. Server-side: Zod validation (defense in depth)
-6. Email sent via Resend API
+6. Contact created in Brevo via API
 
 Each layer is lightweight, and failure at any stage blocks the submission. Most importantly, legitimate users only experience step 1 and 2 — the rest happens transparently.
 
@@ -219,6 +219,6 @@ Security and usability don't have to be in conflict — when done right, they st
 - **Astro 4.x** (SSR enabled) for frontend and API routes
 - **Cloudflare Turnstile** for invisible bot protection
 - **Zod** for type-safe input validation
-- **Resend** for transactional email delivery
+- **Brevo API** for programmatically creating CRM and Email Marketing contacts
 
 If you're dealing with form spam, this stack is production-ready and takes about half a day to implement properly. The combination of honeypot + Turnstile + validation creates defense in depth without UX friction — and it's been running maintenance-free since deployment.
