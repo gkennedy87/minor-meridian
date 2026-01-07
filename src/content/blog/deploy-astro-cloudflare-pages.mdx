@@ -1,0 +1,247 @@
+---
+title: "How to Deploy Astro on Cloudflare Pages Without Getting Screwed by Hidden UI Traps"
+author: "Grant Kennedy"
+date: "2025-11-28"
+categories: ["Web Development"]
+description: "Cloudflare's UI will try to deploy your static Astro site as a Worker. Here's how to catch it, fix it, and set up your domains correctly."
+tags: ["astro", "cloudflare", "deployment", "web-hosting", "static-sites"]
+readingTime: 8
+---
+
+## The Problem Nobody Tells You About
+
+I just deployed my Astro site to Cloudflare Pages. Build succeeded. Deployment succeeded. Site was live.
+
+Except it wasn't on Pages.
+
+Cloudflare had silently shunted my static site to Workers. Wrong service, wrong URL structure, wrong everything. The dashboard gave me `*.workers.dev` instead of `*.pages.dev`.
+
+I burned 90 minutes chasing phantom issues with package managers and build configs before I found the real culprit: a UI pattern so subtle it might as well be invisible.
+
+Look, I've been using Cloudflare for years. They've consistently avoided the predatory patterns that plague this industry. They've made the internet faster and more secure for millions of sites. Their free tier actually helps people instead of functioning as a bait-and-switch. This isn't a hit piece on a company I respect.
+
+But even solid infrastructure companies ship confusing UI sometimes. And this one cost me an afternoon.
+
+This guide exists so you don't repeat my mistakes.
+
+## What You'll Learn
+
+- How to deploy Astro to Cloudflare Pages correctly
+- How to detect when Cloudflare deploys to Workers instead
+- Where to find the hidden "fix" in the UI
+- How to set up custom domains properly
+- How to configure apex-to-www redirects that preserve paths and query strings
+
+No theory. Just what works.
+
+## Step 1: Configure Astro for Static Output
+
+**Time estimate: 2 minutes**
+
+Cloudflare Pages expects static output. If you've previously installed `@astrojs/cloudflare` for SSR, Astro may default to server mode – which triggers Workers deployment.
+
+Your `astro.config.mjs` should look like this:
+
+```typescript
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  output: 'static',
+  site: 'https://www.your-domain.com',
+});
+```
+
+That's it. Static site generation, no server adapter needed.
+
+If you don't need SSR or edge functions, remove `@astrojs/cloudflare` entirely.
+
+I prefer to keep SSR as an option because it's necessary if I want to use Cloudflare Actions - which I do.
+
+## Step 2: Connect Your Repo to Cloudflare
+
+**Time estimate: 5 minutes**
+
+In your Cloudflare dashboard:
+
+1. Navigate to **Workers & Pages**
+2. Click **Create Application**
+3. Select **Pages**
+4. Connect your GitHub repository
+5. Use these build settings:
+
+| Setting | Value |
+|---------|-------|
+| Framework preset | Astro |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+
+Click deploy. Watch it build.
+
+And here's where things go sideways.
+
+## Step 3: Detect the Workers Trap
+
+**Time estimate: 1 minute (to check)**
+
+After deployment completes, look at your deployment URL.
+
+If you see:
+
+```
+myproject.<account-hash>.workers.dev
+```
+
+You've been redirected to Workers. Your static site is now running on the wrong infrastructure.
+
+Other signs you're on Workers:
+
+- Settings page mentions "Worker runtime" or "Path to Worker"
+- No "Build Output Directory" field in the configuration
+- Custom domain setup looks different than expected
+
+This isn't user error. Cloudflare is actively merging Pages and Workers into a unified platform, which is ambitious and probably the right long-term architecture. But during the transition, the UI defaults to Workers in certain edge cases, and the signals are easy to miss.
+
+## Step 4: The Hidden Fix – Shift to Pages
+
+**Time estimate: 30 seconds**
+
+Scroll to the bottom of your project's settings page.
+
+You'll find a small, easy-to-miss link:
+
+**Shift to Pages**
+
+Click it. Cloudflare will reclassify your deployment as a Pages project.
+
+After the shift, you'll see:
+
+- Pages-specific configuration options
+- Custom Domains section with proper controls
+- Build Output Directory field
+- Standard `*.pages.dev` deployment URL
+
+Problem solved. This single click fixes everything.
+
+## Step 5: Add Your Custom Domain
+
+**Time estimate: 3 minutes**
+
+Now that you're properly on Pages:
+
+1. Go to **Workers & Pages → Your Project → Custom Domains**
+2. Click **Add Domain**
+3. Add your `www` subdomain
+
+Set up a CNAME record in Cloudflare DNS:
+
+| Hostname | Target | Type | Proxy |
+|----------|--------|------|-------|
+| www.your-domain.com | `<project>.pages.dev` | CNAME | Orange cloud (proxied) |
+
+Cloudflare will automatically provision an SSL certificate. Wait 2-3 minutes for propagation.
+
+This part actually works beautifully – automatic HTTPS, global CDN, instant cache invalidation. It's why I keep coming back.
+
+## Step 6: Configure Apex-to-WWW Redirect
+
+**Time estimate: 5 minutes**
+
+You want `your-domain.com` to redirect to `www.your-domain.com` with a 301 status. This preserves SEO equity and ensures consistent canonicalization.
+
+### Part A: Add Placeholder Records
+
+Cloudflare requires DNS records to exist before redirect rules can apply. Add these TEST-NET addresses (they're official placeholders that won't serve actual traffic):
+
+| Name | Type | Value | Proxy |
+|------|------|-------|-------|
+| @ | A | 192.0.2.1 | Orange |
+| @ | A | 192.0.2.2 | Orange |
+
+These records exist only to trigger Cloudflare's redirect logic. They don't route real traffic.
+
+### Part B: Create the Redirect Rule
+
+1. Go to **Cloudflare Dashboard → Rules → Redirect Rules**
+2. Select **Use template: Apex → WWW**
+3. Verify these settings:
+   - **Preserve path**: ON
+   - **Preserve query string**: ON
+   - **Status code**: 301 (Moved Permanently)
+
+This ensures URLs like:
+
+```
+https://your-domain.com/blog/post?ref=twitter
+```
+
+Redirect to:
+
+```
+https://www.your-domain.com/blog/post?ref=twitter
+```
+
+Path and query parameters stay intact. SEO tools see a clean 301. No link equity lost.
+
+## Step 7: Test Everything
+
+**Time estimate: 3 minutes**
+
+Run these tests:
+
+| Test URL | Expected Result |
+|----------|----------------|
+| `http://your-domain.com` | Redirects to `https://www.your-domain.com` |
+| `https://your-domain.com/blog` | Redirects to `https://www.your-domain.com/blog` |
+| `your-domain.com/page?ref=social` | Query string preserved after redirect |
+
+Verify with curl:
+
+```bash
+curl -I https://your-domain.com/blog
+```
+
+Look for:
+
+```
+HTTP/2 301
+location: https://www.your-domain.com/blog
+```
+
+If you see 301 and the correct `location` header, you're done.
+
+## Final Checklist
+
+- [ ] Astro configured for static output
+- [ ] Cloudflare recognizes project as Pages (not Workers)
+- [ ] Custom domain linked via CNAME
+- [ ] Apex redirect preserves paths and query strings
+- [ ] HTTPS enforced automatically
+- [ ] Canonical domain consistent across all URLs
+
+## Why This Matters
+
+Cloudflare is consolidating Pages and Workers into a unified developer platform. That's the right move. Workers and Pages share underlying infrastructure, so treating them as distinct products creates artificial boundaries.
+
+But the UI transition isn't finished. The dashboard still treats them as separate services in some contexts while merging them in others. This creates ambiguity, especially for static site deployments where the framework (Astro, Hugo, Eleventy) could theoretically run on either platform.
+
+The result: developers get silently routed to Workers when they expected Pages, then spend time debugging phantom issues.
+
+## What Would Help
+
+A single explicit question during deployment: "Is this a static site or a dynamic application?"
+
+Let developers choose the platform instead of inferring it from build artifacts and adapter detection. Make the "Shift to Pages" option visible during initial setup, not buried at the bottom of a settings page.
+
+Cloudflare has the right instincts here – unifying platforms reduces complexity long-term. But clarity during migration matters. Explicit beats implicit, especially when both options are valid.
+
+## Final Thoughts
+
+Despite this UI friction, Cloudflare remains one of the best deployment platforms available. Fast global CDN, generous free tier, automatic SSL, built-in DDoS protection, and actual innovation in edge computing.
+
+They've earned goodwill by not pulling the usual tech company moves – no sudden pricing hostage situations, no killing useful products arbitrarily, no selling out their users' privacy. That trust is rare and valuable.
+
+This guide exists because I respect Cloudflare enough to want their platform to work smoothly for other developers. The infrastructure is excellent. The UI just needs one more iteration.
+
+---
+
+**Got questions? Hit me up on [Twitter](#) or [LinkedIn](#).**

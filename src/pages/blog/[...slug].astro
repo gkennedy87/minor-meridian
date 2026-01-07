@@ -30,7 +30,6 @@ const { post, readingTime, tocHeadings } = Astro.props;
 const { frontmatter, Content } = post as any;
 
 const pageTitle = frontmatter.title;
-const base = import.meta.env.BASE_URL;
 const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString() : undefined;
 ---
 
@@ -54,7 +53,7 @@ const publishedTime = frontmatter.date ? new Date(frontmatter.date).toISOString(
           })}
         </time>
         
-        <span class="post-reading-time">{readingTime}</span>
+        <span class="post-reading-time">{frontmatter.readingTime} MIN READ</span>
         
         {frontmatter.categories && frontmatter.categories.length > 0 && (
           <div class="post-categories">

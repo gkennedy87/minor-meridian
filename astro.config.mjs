@@ -25,8 +25,11 @@ export default defineConfig({
       wrap: true,
     },
   },
-
+  output: 'static',
   adapter: cloudflare({
-    imageService: 'compile'
+    platformProxy: {
+      enabled: true,
+    },
+    imageService: 'compile',
   }),
 });
