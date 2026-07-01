@@ -17,6 +17,22 @@ const blog = defineCollection({
   }),
 });
 
+const portfolio = defineCollection({
+  type: 'content',
+  schema: ({image}) => z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    date: z.coerce.date(),
+    updatedOn: z.coerce.date().optional(),
+    excerpt: z.string().optional(),
+    categories: z.array(z.string()).default([]),
+    tags: z.array(z.string()).default([]),
+    author: z.string().default('Grant Kennedy'),
+    image: image().optional(),
+    readingTime: z.number().optional(),
+  }),
+});
+
 const legal = defineCollection({
     loader: glob({ base: './src/content/legal', pattern: '**/*.md' }),
     schema: z.object({
@@ -32,4 +48,4 @@ const legal = defineCollection({
     }),
 });
 
-export const collections = { blog, legal };
+export const collections = { blog, legal, portfolio };

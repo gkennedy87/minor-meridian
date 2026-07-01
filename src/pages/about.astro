@@ -1,6 +1,7 @@
 ---
 import Layout from '../components/Layout.astro';
 import { config } from '../config';
+import { Image } from 'astro:assets';
 
 const { title, description, author, social } = config;
 const pageDescription = "Web consultant and developer helping growing businesses fix slow sites, poor SEO, and unclear messaging.";
@@ -16,7 +17,7 @@ const pageDescription = "Web consultant and developer helping growing businesses
     <div class="author-section">
       <div class="author-avatar">
         {author.avatar ? (
-          <img src={author.avatar} alt={author.name} />
+          <Image src={author.avatar} alt={author.name} height={150} width={150}/>
         ) : (
           <div class="avatar-placeholder">
             <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">

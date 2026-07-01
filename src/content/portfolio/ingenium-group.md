@@ -1,0 +1,100 @@
+---
+title: "Rebuilding a Professional Brand Presence for an Executive Search Firm"
+description: "Recreated an entire digital brand from minimal source material while delivering the core assets needed to support business operations within a tight timeframe"
+date: "2026-03-12"
+categories: ["Web Development", "Web Design","Graphic Design", "i18n"]
+readingTime: 4
+image: "./images/ingenium-portfolio-img.png"
+imageAlt: "Ingenium logo on a white field with screenshots of the new website in the background"
+---
+
+# Case Study: Rebuilding a Professional Brand Presence for an Executive Search Firm
+
+## Client
+
+**Ingenium Group**
+
+Executive search and recruitment firm based in Tokyo, Japan.
+
+---
+
+## Challenge
+
+Following a management buyout, Ingenium Group began operating as an independent business once again. While the company retained an experienced leadership team and an established reputation within the executive recruitment industry, it faced an immediate operational challenge.
+
+Years of ownership changes meant that virtually no digital brand assets remained. Aside from printed stationery, the company had no usable logo files, brand guidelines, website, or marketing materials.
+
+At the same time, the business needed to establish its new corporate identity quickly. A professional online presence was required to support discussions with financial institutions, while consultants needed business cards immediately as they began rebuilding client relationships and expanding their candidate network.
+
+The challenge was to recreate an entire digital brand from minimal source material while delivering the core assets needed to support business operations within a tight timeframe.
+
+---
+
+## Solution
+
+The project focused on establishing a complete brand foundation that could support both immediate operational needs and future business growth.
+
+### Brand Identity
+
+With no original design files available, the only remaining visual reference was the company's printed stationery.
+
+High-resolution photographs of the stationery masthead were used to reconstruct the company logo digitally. Using Figma, GIMP, and Inkscape, the logo was recreated as scalable vector artwork suitable for both print and digital applications.
+
+This work formed the basis of a new brand guide, creating consistent typography, colours, and logo usage standards for future marketing materials.
+
+---
+
+### Website Development
+
+Once the brand assets had been established, a bilingual brochure website was designed and developed using Astro.js.
+
+The site focused on presenting the information most important to prospective clients and business partners, including:
+
+* leadership team
+* executive search specialisations
+* company profile
+* corporate information
+* contact details
+
+Particular emphasis was placed on presenting complete corporate information, an important trust signal for businesses operating in Japan.
+
+The website was intentionally lightweight, delivering fast load times while providing a professional digital presence that accurately reflected the firm's executive-level positioning.
+
+---
+
+### Business Communications
+
+To support day-to-day operations immediately, professional company email addresses and forwarding rules were configured, allowing enquiries to be routed directly to the company president until a dedicated CRM and applicant tracking system could be introduced.
+
+This provided a simple but reliable communication workflow without delaying the company's relaunch.
+
+---
+
+### Business Card Design
+
+With the new brand guide in place, bilingual business cards were designed for the consulting team.
+
+The cards were produced with English on one side and Japanese on the other, accommodating the greater information density typically expected on Japanese business cards while maintaining a clean, professional layout consistent with the new visual identity.
+
+---
+
+## Outcomes
+
+The project provided Ingenium Group with a complete set of professional brand assets in time to support its relaunch.
+
+The new website and corporate identity established a credible online presence that reinforced the firm's professional image during discussions with clients, partners, and financial institutions. At the same time, the consulting team was equipped with bilingual business cards and company email addresses, enabling business development activities to begin immediately.
+
+Perhaps most importantly, the engagement created a scalable digital foundation that the company can continue building on as it grows, rather than relying on temporary or inconsistent branding.
+
+---
+
+## Key Deliverables
+
+* Brand identity reconstruction
+* Digital logo recreation (vector artwork)
+* Brand guide
+* Bilingual brochure website developed with Astro.js - English & Japanese
+* Website hosting and CDN configuration
+* Company email aliases and forwarding rules
+* Bilingual business card design
+* Technical foundation for future digital marketing initiatives
