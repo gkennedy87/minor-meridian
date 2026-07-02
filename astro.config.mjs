@@ -6,6 +6,8 @@ import sitemap from '@astrojs/sitemap';
 
 import svelte from '@astrojs/svelte';
 
+import tailwindcss from '@tailwindcss/vite';
+
 // https://astro.build/config
 export default defineConfig({
   // The site property should be your final deployed URL
@@ -23,5 +25,10 @@ export default defineConfig({
       wrap: true,
     },
   },
+
   output: 'static',
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });

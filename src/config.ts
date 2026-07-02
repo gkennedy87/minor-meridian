@@ -23,7 +23,7 @@ export const config: SiteConfig = {
   author: {
     name: "Grant Kennedy",
     bio: "Independent web consultant. I build sites that convert, not ones that win design awards.",
-    // avatar: "/images/avatar.jpg"
+    avatar: "/images/headshot-illustration-small.png"
   },
   tagline: "Performance. Accessibility. SEO. The plumbing that matters.",
   social: {

@@ -8,6 +8,10 @@ image: "./images/ingenium-portfolio-img.png"
 imageAlt: "Ingenium logo on a white field with screenshots of the new website in the background"
 ---
 
+import {Image} from 'astro:assets'
+import DarrenBizCard from './images/darren-biz-card-jp.webp'
+import MackBizCard from './images/mack-ingenium-biz-card-jp-v2.webp'
+
 # Case Study: Rebuilding a Professional Brand Presence for an Executive Search Firm
 
 ## Client
@@ -27,6 +31,8 @@ Years of ownership changes meant that virtually no digital brand assets remained
 At the same time, the business needed to establish its new corporate identity quickly. A professional online presence was required to support discussions with financial institutions, while consultants needed business cards immediately as they began rebuilding client relationships and expanding their candidate network.
 
 The challenge was to recreate an entire digital brand from minimal source material while delivering the core assets needed to support business operations within a tight timeframe.
+
+
 
 ---
 
@@ -75,6 +81,11 @@ This provided a simple but reliable communication workflow without delaying the 
 With the new brand guide in place, bilingual business cards were designed for the consulting team.
 
 The cards were produced with English on one side and Japanese on the other, accommodating the greater information density typically expected on Japanese business cards while maintaining a clean, professional layout consistent with the new visual identity.
+
+<div class="flex flex-col md:flex-row gap-1">
+    <Image src={DarrenBizCard} alt="Japanese version of Darren McKellin's business card. Text is a mix of katakana and kanji in black, on a white background, with the ingenium logo across the top of the card." height={220} width={400} style="aspect-ratio: 7/4; object-fit:scale-down;"/>
+    <Image src={MackBizCard} alt="Japanese version of Darren McKellin's business card. Text is primarily kanji with a black font color on a white background. The ingenium Group logo across the top of the card." height={220} width={400} style="aspect-ratio: 7/4;object-fit:scale-down;"/>
+</div>
 
 ---
 
